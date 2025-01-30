@@ -73,6 +73,8 @@ spec:
     postgresql:
       enabled: true
       existingClaim: forgejo-pvc
+    postgresql-ha:
+      enabled: false
     persistence:
       enabled: true
       existingClaim: forgejo-pvc
