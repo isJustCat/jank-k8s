@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vaultwarden
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: gissilabs
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  url: https://gissilabs.github.io/charts/
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: vaultwarden-release
+  namespace: vaultwarden
+spec:
+  chart:
+    spec:
+      chart: vaultwarden
+      sourceRef:
+        kind: HelmRepository
+        name: gissilabs
+      version: 1.2.5
+  interval: 10m
+  values:
+    service:
+      type: ClusterIP
+      httpPort: 80
+      externalTrafficPolicy: Cluster
+    ingress:
+      enabled: true
+      className: nginx
+      host: pwn.jank.engineer
+      tls:
+        - secretName: ingress-tls
+          hosts:
+            - pwn.jank.engineer
+      persistence:
+        enabled: true
+        size: 1Gi
+        accessMode: ReadWriteOnce
+      resources:
+        requests:
+          cpu: "50m"
+          memory: "120Mi"
