@@ -38,5 +38,5 @@ spec:
       name: letsencrypt-secret
     solvers:
       - http01:
-        ingress:
-          ingressClassName: nginx
+          ingress:
+            ingressClassName: nginx
