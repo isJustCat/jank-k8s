@@ -37,7 +37,7 @@ metadata:
 spec:
   acme:
     email: acme@powolygon.gay
-    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: letsencrypt-secret
     solvers:
