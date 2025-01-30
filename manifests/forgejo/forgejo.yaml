@@ -18,6 +18,14 @@ spec:
   storageClassName: manual
   local:
     path: /opt/forgejo
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+              - node/gizmo
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
