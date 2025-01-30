@@ -35,10 +35,12 @@ spec:
       enabled: true
       className: nginx
       host: pwn.jank.engineer
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-http
       tls:
-        - secretName: ingress-tls
-          hosts:
+        - hosts:
             - pwn.jank.engineer
+          secretName: vaultwarden-tls
       persistence:
         enabled: true
         size: 1Gi
