@@ -28,6 +28,8 @@ spec:
         namespace: snipeit
   interval: 10m
   values:
+    mysql:
+      enabled: true # bleeehrrrrghhh
     config:
       snipeit:
         key: "l24JOkCDCR3xlutqrqfqY3L7bFF8yDm4qj38b+3fLQs=" # uhm this is kinda bad but am lazy right now... should use sops for stuff like that?
