@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: snipeit
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: t3n
+  namespace: snipeit
+spec:
+  interval: 5m0s
+  url: https://storage.googleapis.com/t3n-helm-charts
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: snipeit
+  namespace: snipeit
+spec:
+  chart:
+    spec:
+      chart: t3n/snipeit
+      version: "3.4.1"
+      sourceRef:
+        kind: HelmRepository
+        name: t3n
+        namespace: snipeit
+  interval: 10m
+  values:
+    config:
+      snipeit:
+        key: "l24JOkCDCR3xlutqrqfqY3L7bFF8yDm4qj38b+3fLQs=" # uhm this is kinda bad but am lazy right now... should use sops for stuff like that?
+    service:
+      type: ClusterIP
+      port: 8014
+    ingress:
+      enabled: true
+      className: nginx
+      host: inv.jank.engineer
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-http
+      tls:
+        - hosts:
+            - inv.jank.engineer
+          secretName: snipeit-tls
+    persistence:
+      enabled: true
+      size: 2Gi 
+      accessMode: ReadWriteOnce
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "200m"
+        memory: "512Mi"
+
