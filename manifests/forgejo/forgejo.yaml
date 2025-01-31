@@ -4,80 +4,58 @@ kind: Namespace
 metadata:
   name: forgejo
 ---
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: forgejo-pv
-spec:
-  capacity:
-    storage: 10Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: manual
-  local:
-    path: /opt/forgejo
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-          - key: kubernetes.io/hostname
-            operator: In
-            values:
-              - node/gizmo
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: forgejo-pvc
-  namespace: forgejo
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: manual
-  resources:
-    requests:
-      storage: 10Gi
----
-apiVersion: source.toolkit.fluxcd.io/v1beta2
-kind: OCIRepository
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
 metadata:
   name: forgejo-helm
   namespace: forgejo
 spec:
-    interval: 5m0s
-    url: oci://code.forgejo.org/forgejo-helm/forgejo
-    ref:
-      tag: 11.0.1
+  interval: 5m0s
+  url: oci://code.forgejo.org/forgejo-helm/forgejo
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: app
+  name: forgejo
   namespace: forgejo
 spec:
-  chartRef:
-    kind: OCIRepository
-    name: forgejo-helm
-  interval: 5m0s
+  chart:
+    spec:
+      chart: forgejo
+      sourceRef:
+        kind: HelmRepository
+        name: forgejo-helm
+      version: 11.0.1
+  interval: 10m
   values:
+    service:
+      type: ClusterIP
+      port: 5012
+      name: http
     ingress:
       enabled: true
+      className: nginx
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-http
+      hosts:
+        - host: git.critter.codes
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
       tls:
         - hosts:
             - git.critter.codes
-          secretName: ingress-tls
-    postgresql:
+          secretName: forgejo-tls
+    persistence:
       enabled: true
       existingClaim: forgejo-pvc
-    postgresql-ha:
-      enabled: false
-    persistence:
+    postgresql:
       enabled: true
       existingClaim: forgejo-pvc
     gitea:
       config:
         APP_NAME: "critters' forge"
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "120Mi"

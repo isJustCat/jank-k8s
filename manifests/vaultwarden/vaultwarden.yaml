@@ -29,7 +29,7 @@ spec:
   values:
     service:
       type: ClusterIP
-      httpPort: 80
+      httpPort: 8012
       externalTrafficPolicy: Cluster
     ingress:
       enabled: true
