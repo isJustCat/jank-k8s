@@ -29,22 +29,22 @@ spec:
   values:
     service:
       type: ClusterIP
-      httpPort: 8013
-      externalTrafficPolicy: Cluster
+      port: 5013
+      name: http
     ingress:
       enabled: true
       className: nginx
-      host: budget.jank.engineer
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-http
+      hosts:
+        - host: budget.jank.engineer
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
       tls:
         - hosts:
             - budget.jank.engineer
           secretName: actualbudget-tls
-    persistence:
-      enabled: true
-      size: 2Gi
-      accessMode: ReadWriteOnce
     resources:
       requests:
         cpu: "50m"
