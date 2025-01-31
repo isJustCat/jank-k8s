@@ -20,7 +20,7 @@ metadata:
 spec:
   chart:
     spec:
-      chart: t3n/snipeit
+      chart: snipeit
       version: "3.4.1"
       sourceRef:
         kind: HelmRepository
