@@ -25,27 +25,28 @@ spec:
         kind: HelmRepository
         name: community-charts
       version: 1.1.5
-    interval: 10m
-    values:
-      service:
-        type: ClusterIP
-        httpPort: 8013
-        externalTrafficPolicy: Cluster
-      ingress:
-        enabled: true
-        className: nginx
-        host: budget.jank.engineer
-        annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-http
-        tls:
-          - hosts:
-              - budget.jank.engineer
-            secretName: actualbudget-tls
-        persistence:
-          enabled: true
-          size: 2Gi
-          accessMode: ReadWriteOnce
-        resources:
-          requests:
-            cpu: "50m"
-            memory: "120Mi"
+  interval: 10m
+  values:
+    service:
+      type: ClusterIP
+      httpPort: 8013
+      externalTrafficPolicy: Cluster
+    ingress:
+      enabled: true
+      className: nginx
+      host: budget.jank.engineer
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-http
+      tls:
+        - hosts:
+            - budget.jank.engineer
+          secretName: actualbudget-tls
+    persistence:
+      enabled: true
+      size: 2Gi
+      accessMode: ReadWriteOnce
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "120Mi"
+
