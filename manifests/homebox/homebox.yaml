@@ -1,52 +1,71 @@
-apiVersion: v1
+iapiVersion: v1
 kind: Namespace
 metadata:
   name: homebox
 ---
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: sysadminsmedia
+  name: homebox-deployment
   namespace: homebox
 spec:
-  interval: 5m0s
-  url: https://ghcr.io/sysadminsmedia/homebox
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: homebox-release
-  namespace: homebox
-spec:
-  chart:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: homebox
+  template:
+    metadata:
+      labels:
+        app: homebox
     spec:
-      chart: homebox
-      sourceRef:
-        kind: HelmRepository
-        name: sysadminsmedia
-      version: main-rootless
-  interval: 10m
-  values:
-    service:
-      type: ClusterIP
-      httpPort: 8080
-      externalTrafficPolicy: Cluster
-    ingress:
-      enabled: true
-      className: nginx
-      host: inv.jank.engineer
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-http
-      tls:
-        - hosts:
-            - inv.jank.engineer
-          secretName: homebox-tls
-    persistence:
-      enabled: true
-      size: 1Gi
-      accessMode: ReadWriteOnce
-    resources:
-      requests:
-        cpu: "50m"
-        memory: "120Mi"
+      containers:
+        - name: homebox
+          image: ghcr.io/sysadminsmedia/homebox:main-rootless
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "120Mi"
+            limits:
+              cpu: "100m"
+              memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: homebox-service
+  namespace: homebox
+spec:
+  selector:
+    app: homebox
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: homebox-ingress
+  namespace: homebox
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-http
+spec:
+  rules:
+    - host: inv.jank.engineer
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: homebox-service
+                port:
+                  number: 8080
+  tls:
+    - hosts:
+        - inv.jank.engineer
+      secretName: homebox-tls
 
