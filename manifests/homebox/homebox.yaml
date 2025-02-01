@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: homebox
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: sysadminsmedia
+  namespace: homebox
+spec:
+  interval: 5m0s
+  url: https://ghcr.io/sysadminsmedia/homebox
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: homebox-release
+  namespace: homebox
+spec:
+  chart:
+    spec:
+      chart: homebox
+      sourceRef:
+        kind: HelmRepository
+        name: sysadminsmedia
+      version: main-rootless
+  interval: 10m
+  values:
+    service:
+      type: ClusterIP
+      httpPort: 8080
+      externalTrafficPolicy: Cluster
+    ingress:
+      enabled: true
+      className: nginx
+      host: inv.jank.engineer
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-http
+      tls:
+        - hosts:
+            - inv.jank.engineer
+          secretName: homebox-tls
+    persistence:
+      enabled: true
+      size: 1Gi
+      accessMode: ReadWriteOnce
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "120Mi"
+
