@@ -3,6 +3,32 @@ kind: Namespace
 metadata:
   name: homebox
 ---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: homebox-pv
+  namespace: homebox
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /opt/homebox
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: homebox-pvc
+  namespace: homebox
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -20,9 +46,30 @@ spec:
     spec:
       containers:
         - name: homebox
-          image: ghcr.io/sysadminsmedia/homebox:main-rootless
+          image: ghcr.io/sysadminsmedia/homebox:latest
           ports:
-            - containerPort: 8080
+            - containerPort: 7745
+          env:
+            - name: HBOX_WEB_HOST
+              value: 0.0.0.0
+            - name: HBOX_MAILER_HOST
+              value: "mail.e926.de"
+            - name: HBOX_MAILER_USERNAME
+              value: "obscure-services@e926.de"
+            - name: HBOX_MAILER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: homebox-mail
+                  key: password
+            - name: HBOX_MAILER_FROM
+              value: "noreply@inv.jank.engineer"
+            - name: HBOX_LOG_LEVEL
+              value: "debug"
+            - name: HBOX_MODE
+              value: "development"
+            - name: HBOX_SWAGGER_HOST
+              value: ""
+            
           resources:
             requests:
               cpu: "50m"
@@ -30,6 +77,13 @@ spec:
             limits:
               cpu: "100m"
               memory: "256Mi"
+          volumeMounts:
+            - name: homebox-volume
+              mountPath: /data
+      volumes:
+        - name: homebox-volume
+          persistentVolumeClaim:
+            claimName: homebox-pvc
 ---
 apiVersion: v1
 kind: Service
@@ -41,8 +95,7 @@ spec:
     app: homebox
   ports:
     - protocol: TCP
-      port: 8080
-      targetPort: 8080
+      port: 7745
   type: ClusterIP
 ---
 apiVersion: networking.k8s.io/v1
@@ -53,6 +106,7 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-http
 spec:
+  ingressClassName: nginx
   rules:
     - host: inv.jank.engineer
       http:
@@ -63,7 +117,7 @@ spec:
               service:
                 name: homebox-service
                 port:
-                  number: 8080
+                  number: 7745
   tls:
     - hosts:
         - inv.jank.engineer
