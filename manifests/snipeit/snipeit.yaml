@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: snipeit
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: t3n
+  namespace: snipeit
+spec:
+  interval: 5m0s
+  url: https://storage.googleapis.com/t3n-helm-charts
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: snipeit
+  namespace: snipeit
+spec:
+  interval: 5m0s
+  chart:
+    spec:
+      chart: snipeit
+      version: "3.4.1"
+      sourceRef:
+        kind: HelmRepository
+        name: t3n
+  values:
+    service:
+      type: ClusterIP
+    ingress:
+      enabled: true
+      className: nginx
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-http
+      hosts:
+        - inv.jank.engineer
+      tls:
+        - secretName: snipeit-tls
+          hosts:
+            - inv.jank.engineer
+    config:
+      snipeit:
+        url: http://inv.jank.engineer
+        key: "base64:GTu+X6sNbE+YNMx0Hosct0onddA/SodOrwRbSIDSIX4="
+    mysql:
+      enabled: true
+      mysqlPassword: "vewysecurepassword"
+      mysqlUser: snipeit
+      mysqlDatabase: db-snipeit
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "256Mi"
