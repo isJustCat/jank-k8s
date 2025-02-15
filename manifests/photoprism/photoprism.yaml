@@ -71,3 +71,27 @@ spec:
       targetPort: 2342
   selector:
     app: photoprism
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: photoprism
+  labels:
+    name: photoprism
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - pics.jank.engineer
+      secretName: photoprism-tls
+  rules:
+  - host: pics.jank.engineer
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: photoprism
+            port: 
+              number: 2342
