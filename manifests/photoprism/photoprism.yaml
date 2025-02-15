@@ -25,6 +25,7 @@ spec:
         kind: HelmRepository
         name: photoprism
         namespace: photoprism
+      version: 1.4.0
   interval: 1h
   values:
     ingress:
@@ -34,4 +35,3 @@ spec:
         - hosts:
             - pics.jank.engineer
           secretName: photoprism-tls
-    
