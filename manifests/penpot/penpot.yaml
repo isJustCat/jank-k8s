@@ -28,6 +28,8 @@ spec:
       version: 0.10.0
   interval: 10m
   values:
+    persistence:
+      
     ingress:
       className: nginx
       annotations:
