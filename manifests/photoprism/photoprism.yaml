@@ -4,16 +4,29 @@ metadata:
   name: photoprism
 ---
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: photoprism
+  namespace: photoprism
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/data/photoprism
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: photoprism-data
+  name: photoprism
   namespace: photoprism
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
+      storage: 20Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -44,6 +57,8 @@ spec:
             value: "sqlite"
           - name: PHOTOPRISM_DATABASE_NAME
             value: "photoprism.db"
+          - name: PHOTOPRISM_STORAGE_PATH
+            value: "/photoprism"
         resources:
           requests:
             memory: "256Mi"
@@ -52,12 +67,12 @@ spec:
             memory: "512Mi"
             cpu: "1"
         volumeMounts:
-          - name: photoprism-data
+          - name: photoprism
             mountPath: /photoprism
       volumes:
-        - name: photoprism-data
+        - name: photoprism
           persistentVolumeClaim:
-            claimName: photoprism-data
+            claimName: photoprism
 ---
 apiVersion: v1
 kind: Service
@@ -79,8 +94,9 @@ metadata:
   labels:
     name: photoprism
   namespace: photoprism
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-http
 spec:
-  ingressClassName: nginx
   tls:
     - hosts:
         - pics.jank.engineer
