@@ -22,6 +22,7 @@ metadata:
   name: sharenote
   namespace: sharenote
 spec:
+  storageClassName: local-path
   volumeName: sharenote-pv
   accessModes:
     - ReadWriteOnce
