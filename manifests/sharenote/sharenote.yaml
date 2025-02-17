@@ -50,6 +50,7 @@ spec:
       containers:
       - name: sharenote
         image: ghcr.io/thexyno/sharenote-py
+        imagePullPolicy: Always
         env:
           - name: SECRET_API_KEY
             value: "1385738b72e4a100bbecd4717b32b60f094875999b52670cd04a9cb51675d6ed915e03a8bbfcd87ba900cdc9d969484cbe436dd1180fd18cd17ffbbad4400a7e"
