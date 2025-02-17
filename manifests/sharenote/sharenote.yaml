@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sharenote
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sharenote
+spec:
+  selector:
+    matchLabels:
+      app: sharenote
+  template:
+    metadata:
+      labels:
+        app: sharenote
+    spec:
+      volumes:
+        - name: sharenote
+          persistentVolumeClaim:
+            claimName: sharenote
+      containers:
+      - name: sharenote
+        image: https://github.com/thexyno/sharenote-py
+        env:
+          - name: SECRET_API_KEY
+            value: 1385738b72e4a100bbecd4717b32b60f094875999b52670cd04a9cb51675d6ed915e03a8bbfcd87ba900cdc9d969484cbe436dd1180fd18cd17ffbbad4400a7e
+          - name: SERVER_URL
+            value: https://notes.jank.engineer
+          - name: PORT
+            value: "8086"
+        volumeMounts:
+          - name: sharenote
+            mountPath: /sharenote-py/static
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8086
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sharenote
+spec:
+  selector:
+    app: sharenote
+  ports:
+  - name: http
+    port: 8086
+    targetPort: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sharenote
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-http
+  labels:
+    name: sharenote
+spec:
+  ingressClassName: nginx
+  tls:
+    - secretName: sharenote-tls
+      hosts:
+        - notes.jank.engineer
+  rules:
+  - host: notes.jank.engineer
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: sharenote
+            port: 
+              name: http
+
+
