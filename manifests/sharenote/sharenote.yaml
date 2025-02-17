@@ -22,6 +22,7 @@ metadata:
   name: sharenote
   namespace: sharenote
 spec:
+  volumeName: sharenote-pv
   accessModes:
     - ReadWriteOnce
   resources:
