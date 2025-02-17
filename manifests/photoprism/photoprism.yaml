@@ -97,6 +97,7 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-http
 spec:
+  ingressClassName: nginx
   tls:
     - hosts:
         - pics.jank.engineer
