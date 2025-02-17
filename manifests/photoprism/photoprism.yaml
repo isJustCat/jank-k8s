@@ -78,6 +78,7 @@ metadata:
   name: photoprism
   labels:
     name: photoprism
+  namespace: photoprism
 spec:
   ingressClassName: nginx
   tls:
