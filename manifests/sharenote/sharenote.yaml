@@ -3,12 +3,38 @@ kind: Namespace
 metadata:
   name: sharenote
 ---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sharenote-pv
+  namespace: sharenote
+spec:
+  capacity:
+    storage: 1Gi  
+  accessModes:
+    - ReadWriteOnce
+  hostPath: 
+    path: /mnt/data/sharenote  
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sharenote
+  namespace: sharenote
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi 
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sharenote
   namespace: sharenote
 spec:
+  replicas: 1  
   selector:
     matchLabels:
       app: sharenote
@@ -23,12 +49,12 @@ spec:
             claimName: sharenote
       containers:
       - name: sharenote
-        image: https://github.com/thexyno/sharenote-py
+        image: ghcr.io/thexyno/sharenote-py
         env:
           - name: SECRET_API_KEY
-            value: 1385738b72e4a100bbecd4717b32b60f094875999b52670cd04a9cb51675d6ed915e03a8bbfcd87ba900cdc9d969484cbe436dd1180fd18cd17ffbbad4400a7e
+            value: "1385738b72e4a100bbecd4717b32b60f094875999b52670cd04a9cb51675d6ed915e03a8bbfcd87ba900cdc9d969484cbe436dd1180fd18cd17ffbbad4400a7e"
           - name: SERVER_URL
-            value: https://notes.jank.engineer
+            value: "https://notes.jank.engineer"
           - name: PORT
             value: "8086"
         volumeMounts:
@@ -52,7 +78,6 @@ spec:
   ports:
   - name: http
     port: 8086
-    targetPort: http
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -80,5 +105,3 @@ spec:
             name: sharenote
             port: 
               name: http
-
-
