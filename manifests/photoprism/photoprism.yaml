@@ -22,6 +22,7 @@ metadata:
   name: photoprism
   namespace: photoprism
 spec:
+  storageClassName: photoprism
   accessModes:
     - ReadWriteOnce
   resources:
@@ -85,7 +86,7 @@ spec:
     - port: 2342
       targetPort: 2342
   selector:
-    app: photoprism
+    name: photoprism
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
