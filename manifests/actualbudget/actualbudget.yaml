@@ -24,7 +24,6 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: community-charts
-      version: 1.1.5
   interval: 10m
   values:
     service:
