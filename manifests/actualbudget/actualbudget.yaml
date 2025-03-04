@@ -2,7 +2,6 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: actualbudget
-
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -81,6 +80,6 @@ spec:
       enabled: true
       existingClaim: actualbudget-pvc
     files:
-      server: /data/server-files
-      user: /data/user-files
+      server: /mnt/data/server-files
+      user: /mnt/data/user-files
     strategy: recreate
