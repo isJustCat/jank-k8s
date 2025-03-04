@@ -12,6 +12,32 @@ spec:
   interval: 5m0s
   url: https://gissilabs.github.io/charts/
 ---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: vaultwarden-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  hostPath:
+    path: /mnt/data/vaultwarden/
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vaultwarden-pvc
+spec:
+  storageClassName: local-path
+  volumeName: vaultwarden-pv
+  resources:
+    requests:
+      storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -42,9 +68,10 @@ spec:
             - pwn.jank.engineer
           secretName: vaultwarden-tls
       persistence:
-        enabled: true
+        #enabled: true
         size: 1Gi
         accessMode: ReadWriteOnce
+        existingClaim: vaultwarden-pvc
       resources:
         requests:
           cpu: "50m"

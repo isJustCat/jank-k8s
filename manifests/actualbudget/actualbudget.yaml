@@ -82,4 +82,3 @@ spec:
     files:
       server: /mnt/data/server-files
       user: /mnt/data/user-files
-    strategy: recreate
