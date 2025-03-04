@@ -1,27 +1,27 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: actualbudget
+  name: actual
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: actualbudget-pv
+  namespace: actual
 spec:
-  capacity:
-    storage: 1Gi
-  volumeMode: Filesystem
+  storageClassName: local-path
   accessModes:
     - ReadWriteOnce
-  storageClassName: local-path
+  capacity:
+    storage: 1Gi
   hostPath:
-    path: "/mnt/data/actualbudget"
+    path: /mnt/data/actualbudget
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: actualbudget-pvc
-  namespace: actualbudget
+  namespace: actual
 spec:
   storageClassName: local-path
   volumeName: actualbudget-pv
@@ -31,54 +31,75 @@ spec:
     requests:
       storage: 1Gi 
 ---
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
-metadata:
-  name: community-charts
-  namespace: actualbudget
-spec:
-  interval: 5m0s
-  url: https://community-charts.github.io/helm-charts
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: actualbudget
-  namespace: actualbudget
+  namespace: actual
 spec:
-  chart:
+  selector:
+    matchLabels:
+      app: actualbudget
+  template:
+    metadata:
+      labels:
+        app: actualbudget
     spec:
-      chart: actualbudget
-      sourceRef:
-        kind: HelmRepository
-        name: community-charts
-  interval: 10m
-  values:
-    service:
-      type: ClusterIP
-      # port: 5013
-      name: http
-    ingress:
-      enabled: true
-      className: nginx
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-http
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: actualbudget-pvc
+      containers:
+      - name: actualbudget
+        image: ghcr.io/actualbudget/actual
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5006
+        volumeMounts:
+          - name: data
+            mountPath: /data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: actualbudget
+  namespace: actual
+spec:
+  selector:
+    app: actualbudget
+  ports:
+  - name: http
+    port: 5006
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: actual
+  name: actualbudget-ingress
+  labels:
+    name: actualbudget-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-http
+spec:
+  ingressClassName: nginx
+  tls:
+    - secretName: actualbudget-tls
       hosts:
-        - host: budget.jank.engineer
-          paths:
-            - path: /
-              pathType: ImplementationSpecific
-      tls:
-        - hosts:
-            - budget.jank.engineer
-          secretName: actualbudget-tls
-    resources:
-      requests:
-        cpu: "50m"
-        memory: "120Mi"
-    persistence:
-      enabled: true
-      existingClaim: actualbudget-pvc
-    files:
-      server: /mnt/data/server-files
-      user: /mnt/data/user-files
+        - budget.jank.engineer
+  rules:
+  - host: budget.jank.engineer
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: actualbudget
+            port: 
+              name: http
+
+

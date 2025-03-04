@@ -69,7 +69,7 @@ spec:
             - pwn.jank.engineer
           secretName: vaultwarden-tls
       persistence:
-        #enabled: true
+        enabled: true
         size: 1Gi
         accessMode: ReadWriteOnce
         existingClaim: vaultwarden-pvc

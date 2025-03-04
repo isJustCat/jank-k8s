@@ -14,7 +14,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath: 
-    path: /mnt/data/sharenote/
+    path: /mnt/data/sharenote
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
