@@ -38,7 +38,6 @@ metadata:
   labels:
     app: borgserver
 spec:
-  
   replicas: 1
   selector:
     matchLabels:
@@ -54,7 +53,7 @@ spec:
           claimName: borgserver-pvc
       containers:
         - name: borgserver
-          image: borgserver
+          image: nold360/borgserver
           imagePullPolicy: Always
           ports:
             - containerPort: 22
@@ -77,5 +76,5 @@ spec:
   ports:
   - protocol: TCP
     port: 22
-    nodePort: 2222
+    nodePort: 30222
   type: NodePort
