@@ -53,13 +53,13 @@ spec:
           claimName: borgserver-pvc
       containers:
         - name: borgserver
-          image: nold360/borgserver
+          image: ghcr.io/isjustcat/borgserver
           imagePullPolicy: Always
           ports:
             - containerPort: 22
           volumeMounts:
             - name: data
-              mountPath: /
+              mountPath: /appdata
           resources:
             limits:
               memory: "512Mi"
