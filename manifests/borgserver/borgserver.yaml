@@ -53,7 +53,7 @@ spec:
           claimName: borgserver-pvc
       containers:
         - name: borgserver
-          image: ghcr.io/isjustcat/borgserver
+          image: ghcr.io/isjustcat/borgserver:sha256-1b0efbcd130c093c20f72e884a1abf909ab50374ef9086079ad3ebfef88eed8c
           imagePullPolicy: Always
           ports:
             - containerPort: 22
