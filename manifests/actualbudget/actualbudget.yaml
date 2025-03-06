@@ -73,7 +73,7 @@ spec:
     app: actualbudget
   ports:
   - name: http
-    port: 5006
+    port: 30222
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
