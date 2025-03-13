@@ -92,7 +92,7 @@ metadata:
   labels:
     name: sharenote
 spec:
-  ingressClassName: nginx
+  ingressClassName: traefik
   tls:
     - secretName: sharenote-tls
       hosts:

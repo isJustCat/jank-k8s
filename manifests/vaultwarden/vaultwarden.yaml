@@ -57,7 +57,7 @@ spec:
     domain: "https://pwn.jank.engineer"
     ingress:
       enabled: true
-      class: nginx
+      class: traefik
       hostname: pwn.jank.engineer
       additionalAnnotations:
         cert-manager.io/cluster-issuer: letsencrypt-http

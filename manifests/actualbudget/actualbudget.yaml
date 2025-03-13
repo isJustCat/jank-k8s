@@ -85,7 +85,7 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-http
 spec:
-  ingressClassName: nginx
+  ingressClassName: traefik
   tls:
     - secretName: actualbudget-tls
       hosts:
