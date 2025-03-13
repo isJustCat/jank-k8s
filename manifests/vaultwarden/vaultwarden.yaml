@@ -73,6 +73,6 @@ spec:
         cpu: 100m
         memory: 1G
     image:
-      pullPolicy: always
+      pullPolicy: Always
     service:
       httpPort: 8080
