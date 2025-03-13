@@ -54,6 +54,7 @@ spec:
       version: 0.31.6
   interval: 10m
   values:
+    domain: "https://pwn.jank.engineer"
     service:
       type: ClusterIP
       httpPort: 8012
