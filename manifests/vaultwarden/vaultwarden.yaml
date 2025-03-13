@@ -58,7 +58,7 @@ spec:
     ingress:
       enabled: true
       class: nginx
-      hostnme: pwn.jank.engineer
+      hostname: pwn.jank.engineer
       additionalAnnotations:
         cert-manager.io/cluster-issuer: letsencrypt-http
       tls: true
