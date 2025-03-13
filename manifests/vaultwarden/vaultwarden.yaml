@@ -55,10 +55,6 @@ spec:
   interval: 10m
   values:
     domain: "https://pwn.jank.engineer"
-    service:
-      type: ClusterIP
-      httpPort: 8012
-      externalTrafficPolicy: Cluster
     ingress:
       enabled: true
       class: nginx
@@ -67,14 +63,16 @@ spec:
         cert-manager.io/cluster-issuer: letsencrypt-http
       tls: true
       tlsSecret: vaultwarden-tls
-      existingVolumeClaim:
-        claimName: vaultwarden-pvc
-        size: 5G
-        class: local-path
-        keepPvc: true
-      resources:
-        requests:
-          cpu: 100m
-          memory: 1G
-      image:
-        pullPolicy: always
+    existingVolumeClaim:
+      claimName: vaultwarden-pvc
+      size: 5G
+      class: local-path
+      keepPvc: true
+    resources:
+      requests:
+        cpu: 100m
+        memory: 1G
+    image:
+      pullPolicy: always
+    service:
+      httpPort: 8080
