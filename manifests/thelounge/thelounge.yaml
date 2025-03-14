@@ -50,7 +50,7 @@ spec:
             claimName: thelounge-pvc
       containers:
       - name: thelounge
-        image: ghcr.io/thelounge/
+        image: ghcr.io/thelounge/thelounge
         imagePullPolicy: Always
         volumeMounts:
           - name: thelounge-pv
