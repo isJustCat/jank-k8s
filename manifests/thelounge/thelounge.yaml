@@ -1,0 +1,103 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: thelounge
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: thelounge-pv
+spec:
+  storageClassName: local-path
+  capacity:
+    storage: 5Gi  
+  accessModes:
+    - ReadWriteOnce
+  hostPath: 
+    path: /mnt/data/thelounge
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: thelounge-pvc
+  namespace: thelounge
+spec:
+  resources:
+    requests:
+      storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: thelounge
+  namespace: thelounge
+spec:
+  selector:
+    matchLabels:
+      app: thelounge
+  template:
+    metadata:
+      labels:
+        app: thelounge
+    spec:
+      volumes:
+        - name: thelounge-pv
+          persistentVolumeClaim:
+            claimName: thelounge-pvc
+      containers:
+      - name: thelounge
+        image: ghcr.io/thelounge/
+        imagePullPolicy: Always
+        volumeMounts:
+          - name: thelounge-pv
+            mountPath: /var/opt/thelounge
+        resources:
+          limits:
+            memory: "5G"
+            cpu: "500m"
+        ports:
+        - containerPort: 9000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: thelounge
+  namespace: thelounge
+spec:
+  selector:
+    app: thelounge
+  ports:
+  - name: http
+    port: 9000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: thelounge
+  namespace: thelounge
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-http
+  labels:
+    name: thelounge
+spec:
+  tls:
+    - secretName: thelounge-tls
+      hosts:
+        - tl.jank.engineer
+  rules:
+  - host: tl.jank.engineer
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: thelounge
+            port: 
+              number: http
+
+
