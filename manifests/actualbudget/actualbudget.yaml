@@ -83,7 +83,7 @@ metadata:
   labels:
     name: actualbudget-ingress
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-dns
+    cert-manager.io/cluster-issuer: letsencrypt-http
 spec:
   ingressClassName: traefik
   tls:
