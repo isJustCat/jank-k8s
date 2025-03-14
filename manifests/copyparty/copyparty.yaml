@@ -1,0 +1,95 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: copyparty
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: copyparty-pv
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  hostPath:
+    path: /opt/thelounge
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: copyparty-pvc
+  namespace: copyparty
+spec:
+  resources:
+    requests:
+      storage: 100Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: copyparty
+  namespace: copyparty
+spec:
+  selector:
+    matchLabels:
+      app: copyparty
+  template:
+    metadata:
+      labels:
+        app: copyparty
+    spec:
+      containers:
+      - name: copyparty
+        image: copyparty/ac
+        resources:
+          limits:
+            memory: "2Gi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3923
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: copyparty
+  namespace: copyparty
+spec:
+  selector:
+    app: copyparty
+  ports:
+  - name: http
+    port: 3923
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: copyparty
+  namespace: copyparty
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-http
+  labels:
+    name: copyparty
+spec:
+  tls:
+    - secretName: copyparty-tls
+      hosts:
+        - c.jank.engineer
+  rules:
+  - host: c.jank.engineer
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: copyparty
+            port: 
+              name: http
+
+
