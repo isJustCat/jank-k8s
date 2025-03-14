@@ -98,6 +98,6 @@ spec:
           service:
             name: thelounge
             port: 
-              number: http
+              name: http
 
 
