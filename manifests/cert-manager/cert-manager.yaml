@@ -1,4 +1,4 @@
-apiVersion: 1
+apiVersion: v1
 kind: Namespace
 metadata:
   name: cert-manager
@@ -33,7 +33,7 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  name: letsencrypt-http
+  name: letsencrypt-dns
 spec:
   acme:
     email: acme@powolygon.gay
@@ -41,6 +41,14 @@ spec:
     privateKeySecretRef:
       name: letsencrypt-secret
     solvers:
-      - http01:
-          ingress:
-            ingressClassName: traefik
+      - dns01:
+         webhook:
+           groupName: acme.critter.codes
+           solverName: powerdns
+           config:
+              server: "https://beta.servfail.network/api/v1/"
+              apiKey:
+                valueFrom:
+                  SecretKeyRef:
+                    name: servfail-apikey
+                    key: apikey 
