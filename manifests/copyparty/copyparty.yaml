@@ -44,6 +44,10 @@ spec:
       labels:
         app: copyparty
     spec:
+      volumes:
+        - name: copyparty-pv
+          persistentVolumeClaim:
+            claimName: copyparty-pvc
       containers:
       - name: copyparty
         image: copyparty/ac
