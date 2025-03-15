@@ -2,30 +2,33 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: copyparty
+  name: prometheus
 ---
 apiVersion: v1
 kind: PersistentVolume
+namespace: prometheus
 metadata:
-  name: copyparty-pv
+  name: prometheus-pv
 spec:
   capacity:
-    storage: 100Gi
+    storage: 5Gi
+  volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
   storageClassName: local-path
   hostPath:
-    path: /opt/copyparty
+    path: /mnt/data/prometheus
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: copyparty-pvc
-  namespace: copyparty
+  name: prometheus-pvc
+  namespace: prometheus
 spec:
   resources:
     requests:
-      storage: 100Gi
+      storage: 5Gi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
@@ -33,67 +36,70 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: copyparty
-  namespace: copyparty
+  name: prometheus
+  namespace: prometheus
 spec:
   selector:
     matchLabels:
-      app: copyparty
+      app: prometheus
   template:
     metadata:
       labels:
-        app: copyparty
+        app: prometheus
     spec:
       volumes:
-        - name: copyparty-pv
+        - name: prometheus-data
           persistentVolumeClaim:
-            claimName: copyparty-pvc
+            claimName: prometheus-pvc
       containers:
-      - name: copyparty
-        image: copyparty/ac
+      - name: prometheus
+        image: prom/prometheus
+        volumeMounts:
+          - name: prometheus-data
+            mountPath: /var/lib/grafana
         resources:
           limits:
             memory: "2Gi"
-            cpu: "500m"
+            cpu: "800m"
         ports:
-        - containerPort: 3923
+        - containerPort: 9090
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: copyparty
-  namespace: copyparty
+  name: prometheus
+  namespace: prometheus
 spec:
   selector:
-    app: copyparty
+    app: prometheus
   ports:
   - name: http
-    port: 3923
+    port: 9090
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: copyparty
-  namespace: copyparty
+  name: prometheus
+  namespace: prometheus
+  labels:
+    name: prometheus
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-http
-  labels:
-    name: copyparty
+    ingress.kubernetes.io/auth-type: "basic"
+    ingress.kubernetes.io/auth-secret: "prometheus-auth"
 spec:
   tls:
-    - secretName: copyparty-tls
+    - secretName: prometheus-tls
       hosts:
-        - c.jank.engineer
+        - prom.jank.engineer
   rules:
-  - host: c.jank.engineer
+  - host: prom.jank.engineer
     http:
       paths:
       - pathType: Prefix
         path: "/"
         backend:
           service:
-            name: copyparty
+            name: prometheus
             port: 
               name: http
-
-
