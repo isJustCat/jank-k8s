@@ -21,6 +21,7 @@ spec:
       containers:
       - name: webbedsite
         image: ghcr.io/isjustcat/webbedsite:latest
+        imagePullPolicy: Always
         resources:
           limits:
             memory: "128Mi"
