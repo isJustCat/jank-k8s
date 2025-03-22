@@ -51,6 +51,7 @@ annotations:
 labels:
   name: webbedsite
 spec:
+  ingressClassName: traefik # this shouldn't actually do anything
   tls:
     - secretName: webbedsite-tls
       hosts:
@@ -66,4 +67,3 @@ spec:
                 name: webbedsite
                 port:
                   name: http
-                  
