@@ -46,8 +46,8 @@ kind: Ingress
 metadata:
   name: webbedsite
   namespace: webbedsite
-annotations:
-  cert-manager.io/cluster-issuer: letsencrypt-dns
+  annotations:
+   cert-manager.io/cluster-issuer: letsencrypt-dns
 labels:
   name: webbedsite
 spec:
