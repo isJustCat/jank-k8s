@@ -84,7 +84,7 @@ metadata:
   labels:
     name: prometheus
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-http
+    cert-manager.io/cluster-issuer: letsencrypt-dns
     ingress.kubernetes.io/auth-type: "basic"
     ingress.kubernetes.io/auth-secret: "prometheus-auth"
 spec:

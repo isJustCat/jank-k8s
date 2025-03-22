@@ -88,7 +88,7 @@ metadata:
   name: sharenote
   namespace: sharenote
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-http
+    cert-manager.io/cluster-issuer: letsencrypt-dns
   labels:
     name: sharenote
 spec:

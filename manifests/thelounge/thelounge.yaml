@@ -80,7 +80,7 @@ metadata:
   name: thelounge
   namespace: thelounge
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-http
+    cert-manager.io/cluster-issuer: letsencrypt-dns
   labels:
     name: thelounge
 spec:

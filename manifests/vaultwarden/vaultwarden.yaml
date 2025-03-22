@@ -60,7 +60,7 @@ spec:
       class: traefik
       hostname: pwn.jank.engineer
       additionalAnnotations:
-        cert-manager.io/cluster-issuer: letsencrypt-http
+        cert-manager.io/cluster-issuer: letsencrypt-dns
       tls: true
       tlsSecret: vaultwarden-tls
     existingVolumeClaim:

@@ -47,7 +47,7 @@ metadata:
   name: webbedsite
   namespace: webbedsite
 annotations:
-  cert-manager.io/cluster-issuer: letsencrypt-http
+  cert-manager.io/cluster-issuer: letsencrypt-dns
 labels:
   name: webbedsite
 spec:
@@ -66,4 +66,4 @@ spec:
                 name: webbedsite
                 port:
                   name: http
-  
+                  
