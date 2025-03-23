@@ -35,7 +35,7 @@ spec:
     - kind: Secret
       name: psql-password
       valuesKey:  password
-      targetPath: postgresql.password
+      targetPath: postgresql.auth.password
     - kind: Secret
       name: psql-password
       valuesKey:  password
