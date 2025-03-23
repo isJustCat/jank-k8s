@@ -48,8 +48,8 @@ metadata:
   namespace: webbedsite
   annotations:
    cert-manager.io/cluster-issuer: letsencrypt-dns
-labels:
-  name: webbedsite
+  labels:
+    name: webbedsite
 spec:
   ingressClassName: traefik # this shouldn't actually do anything
   tls:
