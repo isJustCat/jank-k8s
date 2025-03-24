@@ -40,6 +40,10 @@ spec:
       name: authentik-postgresql
       valuesKey:  password
       targetPath: authentik.postgresql.password
+    - kind: Secret
+      name: authentik-password
+      valuesKey: password
+      targetPath: global.env.AUTHENTIK_BOOTSTRAP_PASSWORD
   values:
     server:
       name: "meow"
