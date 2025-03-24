@@ -50,9 +50,9 @@ spec:
         tls:
           - secretName: authentik-tls
             hosts: 
-              - a.jank.engineer
+              - auth.jank.engineer
         hosts:
-          - a.jank.engineer
+          - auth.jank.engineer
     postgresql:
       enabled: true
     redis:
