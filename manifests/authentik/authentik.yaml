@@ -48,7 +48,7 @@ spec:
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-dns
         tls:
-          - secret-name: authentik-tls
+          - secretName: authentik-tls
             hosts: 
               - a.jank.engineer
         hosts:
