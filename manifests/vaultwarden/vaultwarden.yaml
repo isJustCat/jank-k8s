@@ -62,7 +62,7 @@ spec:
       enabled: true
       host: pwn.jank.engineer
       annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-http
+        cert-manager.io/cluster-issuer: letsencrypt-dns
       tls:
         - hosts:
             - pwn.jank.engineer
