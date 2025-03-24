@@ -61,5 +61,3 @@ spec:
       enabled: true
     redis:
       enabled: true
-
-    
