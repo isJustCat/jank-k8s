@@ -42,12 +42,6 @@ spec:
       targetPath: authentik.postgresql.password
   values:
     server:
-      env:
-        - name: AUTHENTIK_BOOTSTRAP_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: authentik-password
-              key: password
       name: "meow"
       ingress:
         enabled: true
