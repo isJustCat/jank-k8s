@@ -6,11 +6,11 @@ metadata:
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
-  name: vaultwarden
+  name: gissilabs
   namespace: vaultwarden
 spec:
   interval: 5m0s
-  url: https://guerzon.github.io/vaultwarden
+  url: https://gissilabs.github.io/charts/
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -18,7 +18,7 @@ metadata:
   name: vaultwarden-pv
 spec:
   capacity:
-    storage: 5Gi
+    storage: 1Gi
   accessModes:
     - ReadWriteOnce
   storageClassName: local-path
@@ -35,7 +35,7 @@ spec:
   volumeName: vaultwarden-pv
   resources:
     requests:
-      storage: 5Gi
+      storage: 1Gi
   accessModes:
     - ReadWriteOnce
 ---
@@ -50,29 +50,29 @@ spec:
       chart: vaultwarden
       sourceRef:
         kind: HelmRepository
-        name: vaultwarden
-      version: 0.31.6
+        name: gissilabs
+      version: 1.2.5
   interval: 10m
   values:
-    domain: "https://pwn.jank.engineer"
+    service:
+      type: ClusterIP
+      httpPort: 8012
+      externalTrafficPolicy: Cluster
     ingress:
       enabled: true
-      class: traefik
-      hostname: pwn.jank.engineer
-      additionalAnnotations:
-        cert-manager.io/cluster-issuer: letsencrypt-dns
-      tls: true
-      tlsSecret: vaultwarden-tls
-    existingVolumeClaim:
-      claimName: vaultwarden-pvc
-      size: 5G
-      class: local-path
-      keepPvc: true
-    resources:
-      requests:
-        cpu: 100m
-        memory: 1G
-    image:
-      pullPolicy: Always
-    service:
-      httpPort: 8080
+      host: pwn.jank.engineer
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-http
+      tls:
+        - hosts:
+            - pwn.jank.engineer
+          secretName: vaultwarden-tls
+      persistence:
+        enabled: true
+        size: 1Gi
+        accessMode: ReadWriteOnce
+        existingClaim: vaultwarden-pvc
+      resources:
+        requests:
+          cpu: "50m"
+          memory: "120Mi"
