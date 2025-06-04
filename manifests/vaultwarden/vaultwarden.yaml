@@ -30,8 +30,6 @@ spec:
   storage:
     size: 1Gi
     storageClass: local-path
-  monitoring:
-    enablePodMonitor: true
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
