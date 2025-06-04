@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -6,73 +7,75 @@ metadata:
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
-  name: gissilabs
+  name: vaultwarden
   namespace: flux-system
 spec:
-  interval: 5m0s
-  url: https://gissilabs.github.io/charts/
+  interval: 10m
+  url: https://guerzon.github.io/vaultwarden
 ---
-apiVersion: v1
-kind: PersistentVolume
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
 metadata:
-  name: vaultwarden-pv
-spec:
-  capacity:
-    storage: 1Gi
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: local-path
-  hostPath:
-    path: /mnt/data/vaultwarden/
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: vaultwarden-pvc
   namespace: vaultwarden
+  name: vaultwarden-db
 spec:
-  storageClassName: local-path
-  volumeName: vaultwarden-pv
+  instances: 3
   resources:
     requests:
-      storage: 1Gi
-  accessModes:
-    - ReadWriteOnce
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 1
+      memory: 128Mi
+  storage:
+    size: 1Gi
+    storageClass: local-path
+  monitoring:
+    enablePodMonitor: true
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: vaultwarden-release
+  name: vaultwarden
   namespace: vaultwarden
 spec:
+  interval: 10m
   chart:
     spec:
       chart: vaultwarden
+      version: 0.32.1
       sourceRef:
         kind: HelmRepository
-        name: gissilabs
-      version: 1.2.5
-  interval: 10m
+        name: vaultwarden
+        namespace: flux-system
+      interval: 10m
   values:
-    service:
-      type: ClusterIP
-      httpPort: 8012
-      externalTrafficPolicy: Cluster
+    domain: "https://pwn.jank.engineer"
+    signupsAllowed: false
+    adminToken:
+      existingSecret: vaultwarden-admin-token
+      existingSecretKey: masterkey
+    database:
+      type: postgresql
+    admin:
+      enabled: true
+      existingSecret: vaultwarden-admin-token
     ingress:
       enabled: true
-      host: pwn.jank.engineer
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-dns
-      tls:
-        - hosts:
-            - pwn.jank.engineer
-          secretName: vaultwarden-tls
-      persistence:
-        enabled: true
-        size: 1Gi
-        accessMode: ReadWriteOnce
-        existingClaim: vaultwarden-pvc
+      hostname: "https://pwn.jank.engineer"
+      tls: true
+      tlsSecret: vaultwarden-tls
+      class: traefik
+      additionalAnnotations:
+        cert-manager.io/cluster-issuer: "letsencrypt-dns"
       resources:
         requests:
-          cpu: "50m"
-          memory: "120Mi"
+          cpu: 100m
+          memory: 1Gi
+        limits:
+          memory: 1Gi
+  valuesFrom:
+    - kind: Secret
+      name: vaultwarden-db-app
+      valuesKey: uri
+      targetPath: database.uriOverride
