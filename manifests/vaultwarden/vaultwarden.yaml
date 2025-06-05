@@ -60,7 +60,7 @@ spec:
       existingSecret: vaultwarden-admin-token
     ingress:
       enabled: true
-      hostname: "https://pwn.jank.engineer"
+      hostname: "pwn.jank.engineer"
       tls: true
       tlsSecret: vaultwarden-tls
       class: traefik
